@@ -1,0 +1,202 @@
+@baseUrl = http://localhost:5000/api
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiaWF0IjoxNzQ5MjE0NzM4LCJleHAiOjE3NDkyMTgzMzh9.0uCMV7Qj_QkwQb7ILfcAAFk9m8EurH-mI-m_dnbHB8c
+// ========================
+// 🔐 AUTH
+// ========================
+
+### Register
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "nim": "1234567",
+  "name": "bar1",
+  "email": "user@examle.com",
+  "password": "123"
+}
+
+### Login
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "nim": "1234567",
+  "password": "123"
+}
+
+### Logout
+POST {{baseUrl}}/auth/logout
+Authorization: Bearer {{token}}
+
+// ========================
+// 👤 USER PROFILE
+// ========================
+
+### Get Profile
+GET {{baseUrl}}/user/profile
+Authorization: Bearer {{token}}
+
+### Update Profile
+PUT {{baseUrl}}/user/profile
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Nama Baru",
+  "email": "emailbaru@example.com",
+  "photo": "https://example.com/photo.jpg"
+}
+
+// ========================
+// 🧸 MAINAN
+// ========================
+
+### Get Semua Mainan
+GET {{baseUrl}}/mainan
+
+### Get Mainan by ID
+GET {{baseUrl}}/mainan/1
+
+### Order Mainan
+POST {{baseUrl}}/mainan/order
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "id": 1,
+  "quantity": 2
+}
+
+// Catatan:
+// Jika masih tidak bisa dan tetap "Toy not found", lakukan langkah berikut:
+// 1. Pastikan ada data mainan dengan id=1 di database. 
+//    Cek dengan query: SELECT * FROM Mainans WHERE id=1;
+// 2. Jika tidak ada, tambahkan data mainan secara manual ke database, misal:
+//    INSERT INTO Mainans (name, description, price, stock) VALUES ('Puzzle', 'Puzzle edukasi', 50000, 10);
+// 3. Setelah data ada, ulangi request ini.
+// 4. Jika error tetap muncul, cek juga penamaan tabel di database (harus "Mainans" dengan huruf besar M dan s di akhir jika default Sequelize).
+// 5. Pastikan endpoint dan controller sudah benar menggunakan model Mainan.
+
+### Search Mainan
+GET {{baseUrl}}/mainan/search?name=Puzzle
+
+### Refresh Mainan
+GET {{baseUrl}}/mainan/refresh
+
+### Tambah Mainan (Form-data, tanpa gambar, WAJIB field 'image' dummy)
+POST {{baseUrl}}/mainan
+Authorization: Bearer {{token}}
+Content-Type: multipart/form-data; boundary=MyBoundary
+
+--MyBoundary
+Content-Disposition: form-data; name="name"
+
+Contoh Mainan
+--MyBoundary
+Content-Disposition: form-data; name="price"
+
+10000
+--MyBoundary
+Content-Disposition: form-data; name="stock"
+
+5
+--MyBoundary
+Content-Disposition: form-data; name="imgUrl"
+
+
+--MyBoundary
+Content-Disposition: form-data; name="image"; filename="empty.jpg"
+Content-Type: image/jpeg
+
+x
+--MyBoundary--
+
+// Tambah Mainan (Form-data, dengan gambar)
+# Ganti path/to/file.jpg dengan path file gambar di komputer Anda
+POST {{baseUrl}}/mainan
+Authorization: Bearer {{token}}
+Content-Type: multipart/form-data; boundary=boundary
+
+--boundary
+Content-Disposition: form-data; name="name"
+
+Mainan Gambar
+--boundary
+Content-Disposition: form-data; name="price"
+
+20000
+--boundary
+Content-Disposition: form-data; name="stock"
+
+10
+--boundary
+Content-Disposition: form-data; name="image"; filename="file.jpg"
+Content-Type: image/jpeg
+
+< ./path/to/file.jpg
+--boundary--
+
+// ========================
+// 🛒 PESANAN
+// ========================
+
+### Buat Pesanan
+POST {{baseUrl}}/pesanan
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "mainanId": 1,
+  "quantity": 2
+}
+
+### Get Pesanan User
+GET {{baseUrl}}/pesanan
+Authorization: Bearer {{token}}
+
+### Bayar Pesanan
+POST {{baseUrl}}/pesanan/pay
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "pesananId": 1
+}
+
+// ========================
+// 🏪 TOKO
+// ========================
+
+### Get Semua Toko
+GET {{baseUrl}}/toko
+
+### Get Toko by ID
+GET {{baseUrl}}/toko/1
+
+### Tambah Toko
+POST {{baseUrl}}/toko
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Toko Mainan Baru",
+  "address": "Jl. Mainan No. 1",
+  "latitude": -6.200000,
+  "longitude": 106.816666
+}
+
+### Update Toko
+PUT {{baseUrl}}/toko/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Toko Mainan Update",
+  "address": "Jl. Mainan No. 2",
+  "latitude": -6.201000,
+  "longitude": 106.817000
+}
+
+### Hapus Toko
+DELETE {{baseUrl}}/toko/2
+Authorization: Bearer {{token}}
